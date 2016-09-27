@@ -38,6 +38,7 @@ PromiseChain = function (scope,functionPropietary){
 
 		me.ifElse = function(condition,iffun,elsefun,resultName){
 			resultName = resultName || '[[lastResult]]';
+			condition = me.bindToPropietary(condition);
 			iffun = me.bindToPropietary(iffun);
 			elsefun = me.bindToPropietary(elsefun);
 
@@ -63,6 +64,7 @@ PromiseChain = function (scope,functionPropietary){
 		me.while = function(condition,fun,resultName){
 			resultName = resultName || '[[lastResult]]';
 			fun = me.bindToPropietary(fun);
+			condition = me.bindToPropietary(condition);
 
 			var nextLinkResolve = null;
 			var nextLink = new Promise(function(resolve, reject) { 	nextLinkResolve = resolve;	});
