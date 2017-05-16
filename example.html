@@ -1,0 +1,80 @@
+<html lang="en">
+<head>
+    <script src="./PromiseChain.js" id=""></script>
+</head>
+<body>
+    <script>
+
+        var dwarf = {
+            gold: 3,
+            money: 0,
+            digSomeGold: function (scope) {
+                var me = this;
+                return new Promise(function (resolve, reject) {
+                    setTimeout(function () {
+                        var goldExtracted = Math.floor(Math.random() * 4);
+                        me.gold += goldExtracted;
+                   //     console.log(me);
+                        console.log("The dwarf got " + goldExtracted + " gold, Total [" + me.gold + "]");
+                        resolve(goldExtracted);
+                    }, 1000);
+                });
+            },
+            askPermisionToSell: function (scope) {
+                var me = this;
+                return new Promise(function (resolve, reject) {
+                    setTimeout(function () {
+
+                        resolve(true);
+
+                    }, 1000);
+                });
+            },
+            sellGold: function (scope) {
+                var me = this;
+                return new Promise(function (resolve, reject) {
+                    setTimeout(function () {
+                        me.gold -= 1;
+                        me.money += 100;
+                        console.log("The dwarf have sell one gold for 100 money");
+                        resolve(me.gold);
+                    }, 1000);
+                });
+            },
+            hasPermision: function (scope) {
+                var me = this;
+                return scope.permision === true;
+            },
+            hasGold: function (scope) {
+                var me = this;
+                console.log("The dwarf have [" + me.gold + "] gold");
+                return me.gold > 0;
+            },
+            countMoney: function (scope) {
+                var me = this;
+                return new Promise(function (resolve, reject) {
+                    setTimeout(function () {
+                        console.log("The dwarf have earned " + me.money + " of money");
+                        //    console.log(scope);
+                        resolve(me.money);
+                    }, 1000);
+                });
+            }
+        }
+
+
+
+        new PromiseChain({}, dwarf)
+            .continue(dwarf.digSomeGold, "fisrtMiningDone")
+            .continue(dwarf.digSomeGold, "secondMiningDone")
+            .continue(dwarf.askPermisionToSell, "permision")
+            .ifElse(dwarf.hasPermision, function (sc) {
+                return new PromiseChain(sc, dwarf)
+                    .while(dwarf.hasGold, dwarf.sellGold, 'whileResults') // results are stored in an array in the scope if no need you can omit the parameter
+                .end();
+            }, function (sc) { return console.warn('go sell your dirty gold anywhere else!'); }, 'ifelseResult')
+            .continue(dwarf.countMoney)
+        .end();
+    </script>
+</body>
+</html>
